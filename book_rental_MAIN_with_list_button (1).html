@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>도서 대여 시스템 (iOS 완전 대응)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 40px 16px;
+      background-color: #f7f9fc;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    input, button {
+      padding: 8px 12px;
+      margin: 4px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 16px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+    }
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      height: 300px;
+      margin: 20px auto;
+      border: 2px dashed #ccc;
+    }
+    #camera-instruction {
+      font-size: 14px;
+      color: #666;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 도서 대여 시스템</h1>
+
+  <input type="text" id="searchInput" placeholder="책 제목을 검색하세요" onkeyup="filterBooks()" />
+  <button onclick="startScanner()">📷 바코드 스캔 시작</button>
+  <button onclick="window.location.href='book-list.html'">📚 책 전체 보기</button>
+
+  <div id="reader"></div>
+  <div id="camera-instruction">※ 카메라가 보이지 않으면 새로고침 해보세요</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>도서명</th>
+        <th>대출자</th>
+        <th>상태</th>
+        <th>대출일</th>
+        <th>반납일</th>
+      </tr>
+    </thead>
+    <tbody id="book-table">
+      <!-- Firebase에서 데이터 로딩 -->
+    </tbody>
+  </table>
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-lPz7Ojjpv_o4EIFwbIUpV54ZCsPVeIE",
+      authDomain: "dw-book-rental.firebaseapp.com",
+      projectId: "dw-book-rental",
+      storageBucket: "dw-book-rental.appspot.com",
+      messagingSenderId: "191103254450",
+      appId: "1:191103254450:web:03a6a2abf82a43aefb2eab"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function loadBooks() {
+      const table = document.getElementById("book-table");
+      table.innerHTML = "";
+      const snapshot = await db.collection("books").get();
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data.title}</td>
+          <td>${data.borrower || "-"}</td>
+          <td>${data.status === "대출 중" ? "📕 대출 중" : "✅ 보관 중"}</td>
+          <td>${data.borrowDate || "-"}</td>
+          <td>${data.returnDate || "-"}</td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function filterBooks() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const rows = document.querySelectorAll("#book-table tr");
+      rows.forEach(row => {
+        const title = row.querySelector("td")?.textContent.toLowerCase() || "";
+        row.style.display = title.includes(input) ? "" : "none";
+      });
+    }
+
+    function startScanner() {
+      const qr = new Html5Qrcode("reader");
+      qr.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: undefined },
+        (text) => {
+          alert("스캔됨: " + text);
+          qr.stop();
+        },
+        (err) => {}
+      ).catch(err => console.error("에러:", err));
+    }
+
+    window.onload = loadBooks;
+  </script>
+</body>
+</html>
