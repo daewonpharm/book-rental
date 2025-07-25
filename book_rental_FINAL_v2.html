@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>도서 대여 시스템 메인</title>
+  <style>
+    body {
+      font-family: '맑은 고딕', Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 40px 32px 32px 32px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2866d6;
+      letter-spacing: 1px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    button {
+      background: #2866d6;
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #173d7a;
+    }
+    .search-box {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    input[type="text"] {
+      width: 280px;
+      padding: 8px 12px;
+      font-size: 16px;
+      border: 1px solid #aab7cf;
+      border-radius: 6px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input[type="text"]:focus {
+      border: 1.5px solid #2866d6;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 9px 11px;
+      text-align: left;
+      border-bottom: 1px solid #f0f1f4;
+    }
+    th {
+      background: #f0f4fa;
+      color: #2360b9;
+      font-weight: 700;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    @media (max-width: 700px) {
+      .container {
+        padding: 18px 5px 5px 5px;
+      }
+      input[type="text"] {
+        width: 98%;
+      }
+      table, th, td {
+        font-size: 13px;
+      }
+      .button-group {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>도서 대여 시스템 메인</h2>
+    <div class="button-group">
+      <button onclick="alert('여기에 대여 기능 구현')">도서 대여</button>
+      <button onclick="alert('여기에 반납 기능 구현')">도서 반납</button>
+      <button onclick="window.location.href='book_list.html'">책 목록 전체보기</button>
+      <button onclick="alert('관리자 페이지는 따로 구현 필요')">관리자</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="도서명, 저자, 구분 등 검색어 입력" onkeyup="searchBooks()">
+    </div>
+    <table id="booksTable">
+      <thead>
+        <tr>
+          <th>도서명</th>
+          <th>저자</th>
+          <th>구분</th>
+          <th>상태</th>
+          <th>대출자</th>
+          <th>대출일</th>
+          <th>반납일</th>
+        </tr>
+      </thead>
+      <tbody id="booksBody">
+        <!-- 여기에 데이터가 들어감 -->
+      </tbody>
+    </table>
+  </div>
+  <script>
+    // 예시 데이터, 엑셀에서 변환 가능
+    const booksData = [
+      { title: "아주 희미한 빛으로도", author: "박상영", category: "소설", status: "대출 가능", borrower: "", rentDate: "", returnDate: "" },
+      { title: "긴긴밤", author: "루리", category: "동화", status: "대출 중", borrower: "김진수", rentDate: "2024-07-12", returnDate: "2024-07-19" },
+      { title: "다정한 것이 살아남는다", author: "브라이언 헤어", category: "인문", status: "대출 가능", borrower: "", rentDate: "", returnDate: "" }
+      // ... 여기에 원하는 만큼 추가
+    ];
+    function renderTable(data) {
+      const tbody = document.getElementById('booksBody');
+      tbody.innerHTML = "";
+      data.forEach(book => {
+        const row = `<tr>
+          <td>${book.title}</td>
+          <td>${book.author}</td>
+          <td>${book.category}</td>
+          <td>${book.status}</td>
+          <td>${book.borrower}</td>
+          <td>${book.rentDate}</td>
+          <td>${book.returnDate}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+    function searchBooks() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = booksData.filter(book =>
+        book.title.toLowerCase().includes(keyword) ||
+        book.author.toLowerCase().includes(keyword) ||
+        book.category.toLowerCase().includes(keyword) ||
+        book.status.toLowerCase().includes(keyword) ||
+        book.borrower.toLowerCase().includes(keyword)
+      );
+      renderTable(filtered);
+    }
+    // 페이지 로드시 테이블 출력
+    renderTable(booksData);
+  </script>
+</body>
+</html>
