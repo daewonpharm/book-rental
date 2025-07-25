@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -81,6 +82,14 @@
     tr:last-child td {
       border-bottom: none;
     }
+    #reader {
+      width: 100%;
+      max-width: 400px;
+      height: 300px;
+      margin: 20px auto;
+      border: 2px dashed #ccc;
+      display: none;
+    }
     @media (max-width: 700px) {
       .container {
         padding: 18px 5px 5px 5px;
@@ -97,19 +106,21 @@
       }
     }
   </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
   <div class="container">
     <h2>도서 대여 시스템 메인</h2>
     <div class="button-group">
-      <button onclick="alert('여기에 대여 기능 구현')">도서 대여</button>
-      <button onclick="alert('여기에 반납 기능 구현')">도서 반납</button>
+      <button onclick="startRental()">도서 대여</button>
+      <button onclick="startReturn()">도서 반납</button>
       <button onclick="window.location.href='book_list.html'">책 목록 전체보기</button>
       <button onclick="alert('관리자 페이지는 따로 구현 필요')">관리자</button>
     </div>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="도서명, 저자, 구분 등 검색어 입력" onkeyup="searchBooks()">
     </div>
+    <div id="reader"></div>
     <table id="booksTable">
       <thead>
         <tr>
@@ -122,19 +133,16 @@
           <th>반납일</th>
         </tr>
       </thead>
-      <tbody id="booksBody">
-        <!-- 여기에 데이터가 들어감 -->
-      </tbody>
+      <tbody id="booksBody"></tbody>
     </table>
   </div>
   <script>
-    // 예시 데이터, 엑셀에서 변환 가능
     const booksData = [
       { title: "아주 희미한 빛으로도", author: "박상영", category: "소설", status: "대출 가능", borrower: "", rentDate: "", returnDate: "" },
       { title: "긴긴밤", author: "루리", category: "동화", status: "대출 중", borrower: "김진수", rentDate: "2024-07-12", returnDate: "2024-07-19" },
       { title: "다정한 것이 살아남는다", author: "브라이언 헤어", category: "인문", status: "대출 가능", borrower: "", rentDate: "", returnDate: "" }
-      // ... 여기에 원하는 만큼 추가
     ];
+
     function renderTable(data) {
       const tbody = document.getElementById('booksBody');
       tbody.innerHTML = "";
@@ -151,6 +159,7 @@
         tbody.innerHTML += row;
       });
     }
+
     function searchBooks() {
       const keyword = document.getElementById('searchInput').value.toLowerCase();
       const filtered = booksData.filter(book =>
@@ -162,7 +171,41 @@
       );
       renderTable(filtered);
     }
-    // 페이지 로드시 테이블 출력
+
+    function startRental() {
+      const empId = prompt("사번을 입력하세요:");
+      if (!empId) return;
+      document.getElementById("reader").style.display = "block";
+      const qr = new Html5Qrcode("reader");
+      qr.start(
+        { facingMode: "environment" },
+        { fps: 10 },
+        (text) => {
+          alert(empId + " 사번으로 " + text + " 도서를 대여합니다.");
+          qr.stop();
+          document.getElementById("reader").style.display = "none";
+        },
+        (err) => {}
+      ).catch(err => console.error("에러:", err));
+    }
+
+    function startReturn() {
+      const empId = prompt("사번을 입력하세요:");
+      if (!empId) return;
+      document.getElementById("reader").style.display = "block";
+      const qr = new Html5Qrcode("reader");
+      qr.start(
+        { facingMode: "environment" },
+        { fps: 10 },
+        (text) => {
+          alert(empId + " 사번으로 " + text + " 도서를 반납합니다.");
+          qr.stop();
+          document.getElementById("reader").style.display = "none";
+        },
+        (err) => {}
+      ).catch(err => console.error("에러:", err));
+    }
+
     renderTable(booksData);
   </script>
 </body>
